@@ -1,7 +1,6 @@
 from pyscreeze import pixel
 import keyboard
 import time
-from timeit import default_timer as timer
 
 def check_and_press_key(x,y,key):
     pixel_1 = pixel(x,y)
