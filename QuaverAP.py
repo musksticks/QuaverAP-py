@@ -2,11 +2,9 @@ from definitions import check_and_press_key
 from threading import Thread, Event
 import keyboard
 
-
 def run_check_and_press_key(x, y, key, stop_event):
     while not stop_event.is_set():
         check_and_press_key(x, y, key)
-
 
 stop_event = Event()
 
@@ -18,11 +16,11 @@ threads = [
 ]
 
 for thread in threads:
+    thread.daemon = True
     thread.start()
 
 try:
-    while not keyboard.is_pressed("q"):
-        pass
+    keyboard.wait('q')
 finally:
     stop_event.set()
     for thread in threads:
