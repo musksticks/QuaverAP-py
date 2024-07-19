@@ -1,27 +1,29 @@
 from definitions import check_and_press_key
-from threading import Thread
+from threading import Thread, Event
 import keyboard
 
-while True:
 
-    # CREATE THREADS
-    a = Thread(target=check_and_press_key, args=(748, 900, 'a'))
-    s = Thread(target=check_and_press_key, args=(890, 900, 's'))
-    d = Thread(target=check_and_press_key, args=(1032, 900, 'd'))
-    f = Thread(target=check_and_press_key, args=(1174, 900, 'f'))
+def run_check_and_press_key(x, y, key, stop_event):
+    while not stop_event.is_set():
+        check_and_press_key(x, y, key)
 
-    # START THREADS
-    a.start()
-    s.start()
-    d.start()
-    f.start()
 
-    # SYNC THREADS
-    a.join()
-    s.join()
-    d.join()
-    f.join()
+stop_event = Event()
 
-    # SAFETY
-    if keyboard.is_pressed("q"):
-        break
+threads = [
+    Thread(target=run_check_and_press_key, args=(748, 900, 'a', stop_event)),
+    Thread(target=run_check_and_press_key, args=(890, 900, 's', stop_event)),
+    Thread(target=run_check_and_press_key, args=(1032, 900, 'd', stop_event)),
+    Thread(target=run_check_and_press_key, args=(1174, 900, 'f', stop_event))
+]
+
+for thread in threads:
+    thread.start()
+
+try:
+    while not keyboard.is_pressed("q"):
+        pass
+finally:
+    stop_event.set()
+    for thread in threads:
+        thread.join()
